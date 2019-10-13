@@ -1,0 +1,35 @@
+<%- include('partials/header.ejs') %>
+
+<main role="main" class="inner cover">
+
+    <% talks.forEach(function(talk) { %>
+
+      <div class="card">
+        <h5 class="card-header"><%= talk.title %>
+          <% if (talk.analysis.comparative > 0) { %>
+          <i class="fas fa-smile-beam"></i>
+          <% } else if (talk.analysis.comparative < 0) { %>
+          <i class="fas fa-angry"></i>
+          <% } else { %>
+          <i class="fas fa-meh"></i>
+          <% } %>
+        </h5>
+        <div class="card-body">
+
+          <p class="card-text"><%= talk.content %></p>
+
+          <p class="card-text">
+            <small class="text-muted">
+              <%= talk._id.getTimestamp().toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) %>
+            </small>
+          </p>
+
+          <a href="/talks/<%= talk.id %>" class="btn btn-secondary">Remember this talk</a>
+        </div>
+      </div>
+
+    <% }); %>
+
+</main>
+
+<%- include('partials/footer.ejs') %>
