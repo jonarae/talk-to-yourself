@@ -67,14 +67,16 @@ app.post('/talk', function(req, res) {
 });
 
 app.get('/talks', function(req, res) {
-  Talk.find({}, function(err, foundTalks) {
-    if (err) {
-      console.log(err);
-      res.redirect('/');
-    } else {
-      res.render('talks', {talks: foundTalks});
-    }
-  });
+  Talk.find({})
+    .sort({_id: -1})
+    .exec(function(err, foundTalks) {
+      if (err) {
+        console.log(err);
+        res.redirect('/');
+      } else {
+        res.render('talks', {talks: foundTalks});
+      }
+    });
 });
 
 app.get('/talks/:id', function(req, res) {
