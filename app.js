@@ -84,7 +84,18 @@ app.get('/talks/:id', function(req, res) {
     if (err) {
       console.log(err);
     } else {
-      res.render('talk-entry', {talk: foundTalk});
+      const negativeWords = foundTalk.analysis.negative;
+      const negativeRegex = new RegExp(negativeWords.join('|'), 'gi');
+
+      let content = foundTalk.content;
+      content = content.replace(negativeRegex, function(word) {
+        return `<mark>${word}</mark>`;
+      });
+
+      res.render('talk-entry', {
+        title: foundTalk.title,
+        content: content
+      });
     }
   });
 });
