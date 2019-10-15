@@ -1,12 +1,31 @@
 // jshint esversion: 6
 
+require("dotenv").config();
 const express = require('express');
+const session = require("express-session");
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
+const passport = require('passport');
+const passportLocalMongoose = require('passport-local-mongoose');
+const LocalStrategy = require('passport-local').Strategy;
 const Sentiment = require('sentiment');
 
 const sentiment = new Sentiment();
+
+const app = express();
+app.set('view engine', 'ejs');
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.static('public'));
+
+app.use(session({
+  secret: process.env.SECRET,
+  resave: false,
+  saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Mongoose Operations
 mongoose.connect('mongodb://localhost:27017/ttyDB', {useNewUrlParser: true, useUnifiedTopology: true});
@@ -31,18 +50,26 @@ const talkSchema = new mongoose.Schema ({
 
 const Talk = mongoose.model('Talk', talkSchema);
 
-const app = express();
+// User talkSchema
+const userSchema = new mongoose.Schema ({
+  username: String,
+  password: String,
+  talks: [talkSchema]
+});
 
-app.set('view engine', 'ejs');
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(express.static('public'));
+userSchema.plugin(passportLocalMongoose);
+const User = mongoose.model('User', userSchema);
+
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 app.get('/', function(req, res) {
   res.render('home');
 });
 
 app.get('/talk', function(req, res) {
-  res.render('talk');
+  res.render('talk', {isLoggedIn: req.isAuthenticated()});
 });
 
 app.post('/talk', function(req, res) {
@@ -56,27 +83,39 @@ app.post('/talk', function(req, res) {
     analysis: new Analysis(analysis)
   });
 
-  submittedTalk.save(function(err, talk) {
-    if (err) {
-      console.log(err);
-      res.redirect('/');
-    } else {
-      res.redirect('/talks');
-    }
-  });
+  if (req.body.button === 'login') {
+
+    // TODO: when logged in
+
+  } else {
+    User.register(new User({username: req.body.username, talks: [submittedTalk]}), req.body.password, function(err, user) {
+        if (err) {
+          console.log(err);
+          res.redirect('/');
+        } else {
+          passport.authenticate('local')(req, res, function () {
+              res.redirect('/talks');
+          });
+        }
+    });
+  }
 });
 
 app.get('/talks', function(req, res) {
-  Talk.find({})
-    .sort({_id: -1})
-    .exec(function(err, foundTalks) {
+  if (req.isAuthenticated()) {
+    console.log('from /talks', req.user);
+
+    User.findById(req.user.id, function(err, foundUser) {
       if (err) {
         console.log(err);
-        res.redirect('/');
       } else {
-        res.render('talks', {talks: foundTalks});
+        res.render('talks', {talks: foundUser.talks});
       }
     });
+  }
+  else {
+    res.redirect("/");
+  }
 });
 
 app.get('/talks/:id', function(req, res) {

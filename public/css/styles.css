@@ -118,3 +118,8 @@ mark {
   text-align: left;
   margin-bottom: 1rem;
 }
+
+/* Modal */
+.modal {
+  text-align: left;
+}

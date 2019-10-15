@@ -2,7 +2,7 @@
 
 <main role="main" class="inner cover">
   <h1>Go ahead, talk to yourself.</h1>
-  <form class="" action="/talk" method="post">
+  <form action="/talk" method="post">
     <div class="form-group">
       <input type="text" class="form-control" name="title" placeholder="Hi, self! What do you want to talk about?" autocomplete="off">
     </div>
@@ -11,8 +11,49 @@
       <textarea class="form-control" name="content" rows="8" cols="80" placeholder="OK! What about it?"></textarea>
     </div>
 
-    <button type="submit" class="btn btn-secondary" name="button">Done Talking</button>
+    <% if (isLoggedIn) { %>
+    <button type="submit" class="btn btn-secondary" name="button" value="donetalking">
+      <% } else { %>
+      <button type="button" class="btn btn-secondary" name="button" data-toggle="modal" data-target="#exampleModal">
+        <% } %>
+
+        Done Talking
+      </button>
+
+      <!-- Modal -->
+      <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Keep track of your self-talks</h5>
+              <button type="button" class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+            <div class="modal-body">
+
+              <div class="form-group">
+                <label for="username" class="col-form-label">Username</label>
+                <input type="text" class="form-control" name="username" placeholder="Your email here">
+              </div>
+              <div class="form-group">
+                <label for="password" class="col-form-label">Password</label>
+                <input type="password" class="form-control" name="password" placeholder="Password">
+              </div>
+
+            </div>
+
+            <div class="modal-footer">
+              <button type="submit" name="button" value="signup" class="btn btn-secondary">Sign up</button>
+              <button type="submit" name="button" value="login" class="btn btn-secondary">Log in</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
   </form>
+
 </main>
 
 <%- include('partials/footer.ejs') %>
