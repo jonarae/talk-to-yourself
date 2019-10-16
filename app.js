@@ -15,7 +15,9 @@ const sentiment = new Sentiment();
 
 const app = express();
 app.set('view engine', 'ejs');
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 app.use(express.static('public'));
 
 app.use(session({
@@ -28,10 +30,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Mongoose Operations
-mongoose.connect('mongodb://localhost:27017/ttyDB', {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect('mongodb://localhost:27017/ttyDB', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 
 // Sentiment Schema
-const analysisSchema = new mongoose.Schema ({
+const analysisSchema = new mongoose.Schema({
   score: Number,
   comparative: Number,
   tokens: Array,
@@ -42,7 +47,7 @@ const analysisSchema = new mongoose.Schema ({
 const Analysis = mongoose.model('Analysis', analysisSchema);
 
 // Talk Schema
-const talkSchema = new mongoose.Schema ({
+const talkSchema = new mongoose.Schema({
   title: String,
   content: String,
   analysis: analysisSchema
@@ -51,7 +56,7 @@ const talkSchema = new mongoose.Schema ({
 const Talk = mongoose.model('Talk', talkSchema);
 
 // User talkSchema
-const userSchema = new mongoose.Schema ({
+const userSchema = new mongoose.Schema({
   username: String,
   password: String,
   talks: [talkSchema]
@@ -69,7 +74,9 @@ app.get('/', function(req, res) {
 });
 
 app.get('/talk', function(req, res) {
-  res.render('talk', {isLoggedIn: req.isAuthenticated()});
+  res.render('talk', {
+    isLoggedIn: req.isAuthenticated()
+  });
 });
 
 app.post('/talk', function(req, res) {
@@ -83,62 +90,131 @@ app.post('/talk', function(req, res) {
     analysis: new Analysis(analysis)
   });
 
-  if (req.body.button === 'login') {
-
-    // TODO: when logged in
-
+  if (req.isAuthenticated()) {
+    User.findByIdAndUpdate(req.user.id, {
+      $push: {
+        talks: {
+          $each: [submittedTalk],
+          $sort: {
+            _id: -1
+          }
+        }
+      }
+    }, function(err, foundUser) {
+      if (err) {
+        console.log(err);
+        res.redirect('/');
+      } else {
+        res.redirect('/talks');
+      }
+    });
   } else {
-    User.register(new User({username: req.body.username, talks: [submittedTalk]}), req.body.password, function(err, user) {
+
+    if (req.body.button === 'login') {
+
+      const user = new User({
+        username: req.body.username,
+        password: req.body.password
+      });
+
+      req.login(user, function(err) {
+        passport.authenticate('local')(req, res, function() {
+
+          User.findByIdAndUpdate(req.user.id, {
+            $push: {
+              talks: {
+                $each: [submittedTalk],
+                $sort: {
+                  _id: -1
+                }
+              }
+            }
+          }, function(err, foundUser) {
+            if (err) {
+              console.log(err);
+              res.redirect('/');
+            } else {
+              res.redirect('/talks');
+            }
+          });
+
+
+        });
+      });
+
+    } else {
+      User.register(new User({
+        username: req.body.username,
+        talks: [submittedTalk]
+      }), req.body.password, function(err, user) {
         if (err) {
           console.log(err);
           res.redirect('/');
         } else {
-          passport.authenticate('local')(req, res, function () {
-              res.redirect('/talks');
+          passport.authenticate('local')(req, res, function() {
+            res.redirect('/talks');
           });
         }
-    });
+      });
+    }
   }
 });
 
 app.get('/talks', function(req, res) {
   if (req.isAuthenticated()) {
-    console.log('from /talks', req.user);
-
     User.findById(req.user.id, function(err, foundUser) {
       if (err) {
         console.log(err);
       } else {
-        res.render('talks', {talks: foundUser.talks});
+        res.render('talks', {
+          talks: foundUser.talks
+        });
       }
     });
-  }
-  else {
+  } else {
     res.redirect("/");
   }
 });
 
 app.get('/talks/:id', function(req, res) {
-  const id = req.params.id;
+  const talkId = req.params.id;
 
-  Talk.findById(id, function(err, foundTalk) {
-    if (err) {
-      console.log(err);
-    } else {
-      const negativeWords = foundTalk.analysis.negative;
-      const negativeRegex = new RegExp(negativeWords.join('|'), 'gi');
+  if (req.isAuthenticated()) {
 
-      let content = foundTalk.content;
-      content = content.replace(negativeRegex, function(word) {
-        return `<mark>${word}</mark>`;
-      });
+    User.findById(req.user.id, {
+      talks: {
+        $elemMatch: {
+          _id: talkId
+        }
+      }
+    }, function(err, foundUser) {
 
-      res.render('talk-entry', {
-        title: foundTalk.title,
-        content: content
-      });
-    }
-  });
+      if (err || foundUser.talks.length === 0) {
+        console.log(err);
+        res.redirect('/');
+      } else {
+
+        // length is always 1
+        foundUser.talks.forEach(function(foundTalk) {
+          const negativeWords = foundTalk.analysis.negative;
+          const negativeRegex = new RegExp(negativeWords.join('|'), 'gi');
+
+          let content = foundTalk.content;
+          content = content.replace(negativeRegex, function(word) {
+            return `<mark>${word}</mark>`;
+          });
+
+          res.render('talk-entry', {
+            title: foundTalk.title,
+            content: content
+          });
+        });
+      }
+    });
+
+  } else {
+    res.redirect("/");
+  }
 });
 
 const port = process.env.PORT || 3000;
