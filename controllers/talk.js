@@ -95,13 +95,16 @@ exports.postTalk = (req, res) => {
 };
 
 exports.getTalks = (req, res) => {
-  if (req.isAuthenticated()) {
+  const isLoggedIn = req.isAuthenticated();
+
+  if (isLoggedIn) {
     User.findById(req.user.id, function(err, foundUser) {
       if (err) {
         console.log(err);
       } else {
         res.render('talks', {
-          talks: foundUser.talks
+          talks: foundUser.talks,
+          isLoggedIn: isLoggedIn
         });
       }
     });
@@ -112,8 +115,9 @@ exports.getTalks = (req, res) => {
 
 exports.getTalksId = (req, res) => {
   const talkId = req.params.id;
+  const isLoggedIn = req.isAuthenticated();
 
-  if (req.isAuthenticated()) {
+  if (isLoggedIn) {
 
     User.findById(req.user.id, {
       talks: {
@@ -139,6 +143,7 @@ exports.getTalksId = (req, res) => {
           });
 
           res.render('talk-entry', {
+            isLoggedIn: isLoggedIn,
             title: foundTalk.title,
             content: content
           });

@@ -44,8 +44,12 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.get('/', function(req, res) {
-  res.render('home');
+  const isLoggedIn = req.isAuthenticated();
+  res.render('home', {isLoggedIn: isLoggedIn});
 });
 
 const talkRoutes = require('./routes/talk');
+const indexRoutes = require('./routes/index');
+
 app.use(talkRoutes);
+app.use(indexRoutes);

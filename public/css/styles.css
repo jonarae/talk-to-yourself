@@ -6,7 +6,7 @@
 a,
 a:focus,
 a:hover {
-  color: #fff;
+  color: #333;
 }
 
 
@@ -62,7 +62,7 @@ mark {
   border-bottom-color: rgba(0, 0, 0, .25);
 }
 
-.nav-masthead .nav-link + .nav-link {
+.nav-masthead .nav-link {
   margin-left: 1rem;
 }
 
