@@ -1,20 +1,44 @@
 // jshint esversion: 6
 
 const passport = require('passport');
+const Sentiment = require('sentiment');
 
 const User = require('../models/user');
 
 exports.signup = (req, res) => {
+  const title = req.body.title;
+  const content = req.body.content;
 
-  User.register(new User({
+  const newUserInfo = {
     username: req.body.username
-  }), req.body.password, function(err, user) {
+  };
+
+  if (title && content) {
+    const sentiment = new Sentiment();
+    const analysis = sentiment.analyze(content);
+
+    const submittedTalk = {
+      title: title,
+      content: content,
+      analysis: analysis
+    };
+    newUserInfo.talks = [submittedTalk];
+  }
+
+  const newUser = new User(newUserInfo);
+
+  User.register(newUser, req.body.password, function(err, user) {
     if (err) {
       console.log(err);
       res.redirect('/');
     } else {
       passport.authenticate('local')(req, res, function() {
-        res.redirect('/');
+        if (newUserInfo.talks) {
+          res.redirect('/talks');
+        }
+        else {
+          res.redirect('/');
+        }
       });
     }
   });
@@ -22,6 +46,8 @@ exports.signup = (req, res) => {
 };
 
 exports.login = (req, res) => {
+  const title = req.body.title;
+  const content = req.body.content;
 
   const user = new User({
     username: req.body.username,
@@ -30,7 +56,38 @@ exports.login = (req, res) => {
 
   req.login(user, function(err) {
     passport.authenticate('local')(req, res, function() {
-      res.redirect('/');
+
+      if (title && content) {
+        const sentiment = new Sentiment();
+        const analysis = sentiment.analyze(content);
+
+        const submittedTalk = {
+          title: title,
+          content: content,
+          analysis: analysis
+        };
+
+        User.findByIdAndUpdate(req.user.id, {
+          $push: {
+            talks: {
+              $each: [submittedTalk],
+              $sort: {
+                _id: -1
+              }
+            }
+          }
+        }, function(err, foundUser) {
+          if (err) {
+            console.log(err);
+            res.redirect('/');
+          } else {
+            res.redirect('/talks');
+          }
+        });
+      }
+      else {
+        res.redirect('/');
+      }
     });
   });
 

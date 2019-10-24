@@ -12,12 +12,13 @@
     </div>
 
     <% if (isLoggedIn) { %>
-    <button type="submit" class="btn btn-secondary" name="button" value="donetalking">
-      <% } else { %>
+      <button type="submit" class="btn btn-secondary" name="button" value="donetalking">
+    <% } else { %>
       <button type="button" class="btn btn-secondary" name="button" data-toggle="modal" data-target="#signupModal">
-        <% } %>
-        Done Talking
-      </button>
+    <% } %>
+
+    Done Talking
+    </button>
 
   </form>
 

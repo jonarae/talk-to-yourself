@@ -42,55 +42,6 @@ exports.postTalk = (req, res) => {
         res.redirect('/talks');
       }
     });
-  } else {
-
-    if (req.body.button === 'login') {
-
-      const user = new User({
-        username: req.body.username,
-        password: req.body.password
-      });
-
-      req.login(user, function(err) {
-        passport.authenticate('local')(req, res, function() {
-
-          User.findByIdAndUpdate(req.user.id, {
-            $push: {
-              talks: {
-                $each: [submittedTalk],
-                $sort: {
-                  _id: -1
-                }
-              }
-            }
-          }, function(err, foundUser) {
-            if (err) {
-              console.log(err);
-              res.redirect('/');
-            } else {
-              res.redirect('/talks');
-            }
-          });
-
-
-        });
-      });
-
-    } else {
-      User.register(new User({
-        username: req.body.username,
-        talks: [submittedTalk]
-      }), req.body.password, function(err, user) {
-        if (err) {
-          console.log(err);
-          res.redirect('/');
-        } else {
-          passport.authenticate('local')(req, res, function() {
-            res.redirect('/talks');
-          });
-        }
-      });
-    }
   }
 };
 

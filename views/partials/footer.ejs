@@ -14,6 +14,9 @@
       <form action="/signup" method="post">
         <div class="modal-body">
 
+          <input type="hidden" name="title">
+          <input type="hidden" name="content">
+
           <div class="form-group">
             <label for="username" class="col-form-label">Username</label>
             <input type="email" class="form-control" name="username" placeholder="Your email here">
@@ -55,6 +58,9 @@
       <form action="/login" method="post">
         <div class="modal-body">
 
+          <input type="hidden" name="title">
+          <input type="hidden" name="content">
+
           <div class="form-group">
             <label for="username" class="col-form-label">Username</label>
             <input type="email" class="form-control" name="username" placeholder="Your email here">
@@ -90,6 +96,23 @@
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script>
+  $('#signupModal').on('shown.bs.modal', function(e) {
+      const title = $('main input[name ="title"]').val();
+      const content = $('main textarea[name ="content"]').val();
+
+      $('#signupModal input[name ="title"]').val(title);
+      $('#signupModal input[name ="content"]').val(content);
+  });
+
+  $('#loginModal').on('shown.bs.modal', function(e) {
+      const title = $('main input[name ="title"]').val();
+      const content = $('main textarea[name ="content"]').val();
+
+      $('#loginModal input[name ="title"]').val(title);
+      $('#loginModal input[name ="content"]').val(content);
+  });
+</script>
 </body>
 
 </html>
