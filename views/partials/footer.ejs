@@ -1,117 +1,13 @@
-<!-- Sign Up Modal -->
-<div class="modal fade" id="signupModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
+<%- include('signup.ejs') %>
 
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Keep track of your self-talks</h5>
-        <button type="button" class="close" data-dismiss="modal">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
+<%- include('login.ejs') %>
 
-
-      <form action="/signup" method="post">
-        <div class="modal-body">
-
-          <input type="hidden" name="title">
-          <input type="hidden" name="content">
-
-          <div class="form-group">
-            <label for="username" class="col-form-label">Username</label>
-            <input type="email" class="form-control" name="username" placeholder="Your email here">
-          </div>
-          <div class="form-group">
-            <label for="password" class="col-form-label">Password</label>
-            <input type="password" class="form-control" name="password" placeholder="Password">
-          </div>
-
-        </div>
-
-        <div class="modal-footer">
-          <button type="submit" name="button" value="signup" class="btn btn-secondary btn-block">Sign up</button>
-        </div>
-
-        <div class="modal-footer">
-          <p class="text-muted">Already have an account? <a href="#" class="text-dark" data-dismiss="modal" data-toggle="modal" data-target="#loginModal">Login</a></p>
-        </div>
-
-      </form>
-    </div>
-
-  </div>
-</div>
-
-<!-- Login Modal -->
-<div class="modal fade" id="loginModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Keep track of your self-talks</h5>
-        <button type="button" class="close" data-dismiss="modal">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-
-
-      <form action="/login" method="post">
-        <div class="modal-body">
-
-          <input type="hidden" name="title">
-          <input type="hidden" name="content">
-
-          <div class="form-group">
-            <label for="username" class="col-form-label">Username</label>
-            <input type="email" class="form-control" name="username" placeholder="Your email here">
-          </div>
-          <div class="form-group">
-            <label for="password" class="col-form-label">Password</label>
-            <input type="password" class="form-control" name="password" placeholder="Password">
-          </div>
-
-        </div>
-
-        <div class="modal-footer">
-          <button type="submit" name="button" class="btn btn-secondary btn-block">Log in</button>
-        </div>
-
-        <div class="modal-footer">
-          <p class="text-muted">Don't have an account? <a href="#" class="text-dark" data-dismiss="modal" data-toggle="modal" data-target="#signupModal">Sign up</a></p>
-        </div>
-
-      </form>
-    </div>
-
-  </div>
-</div>
-
-<footer class="mastfoot mt-auto">
-  <div class="inner">
-    <p>&copy; Jklmno 2019</p>
-  </div>
-</footer>
-</div>
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-<script>
-  $('#signupModal').on('shown.bs.modal', function(e) {
-      const title = $('main input[name ="title"]').val();
-      const content = $('main textarea[name ="content"]').val();
+<script src="js/modal.js"></script>
 
-      $('#signupModal input[name ="title"]').val(title);
-      $('#signupModal input[name ="content"]').val(content);
-  });
-
-  $('#loginModal').on('shown.bs.modal', function(e) {
-      const title = $('main input[name ="title"]').val();
-      const content = $('main textarea[name ="content"]').val();
-
-      $('#loginModal input[name ="title"]').val(title);
-      $('#loginModal input[name ="content"]').val(content);
-  });
 </script>
 </body>
 
